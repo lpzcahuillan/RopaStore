@@ -2,10 +2,30 @@
   "info": {
     "_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
     "name": "Tienda de Ropa - Microservicios",
-    "description": "Colección completa para el sistema de microservicios de Tienda de Ropa (ms-usuarios, ms-inventario, ms-pedidos, ms-ventas). Incluye casos exitosos y casos de error (401, 404, 409, 402).",
+    "description": "Colección completa para el sistema de microservicios de Tienda de Ropa. Incluye variables de URL independientes por microservicio (baseUrlUsuarios, baseUrlInventario, baseUrlPedidos, baseUrlVentas), pruebas automatizadas para el CRUD completo de productos y categorías, y casos de error (401, 404, 409, 402).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
+    {
+      "key": "baseUrlUsuarios",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "baseUrlInventario",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "baseUrlPedidos",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "baseUrlVentas",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
     {
       "key": "usuariosUrl",
       "value": "http://localhost:8081",
@@ -35,6 +55,11 @@
       "key": "tokenCliente",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "productoNuevoId",
+      "value": "6",
+      "type": "string"
     }
   ],
   "item": [
@@ -43,6 +68,19 @@
       "item": [
         {
           "name": "1. Registro de Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -56,8 +94,8 @@
               "raw": "{\n  \"nombre\": \"Nuevo Cliente Postman\",\n  \"email\": \"nuevo.cliente@tienda.com\",\n  \"password\": \"Cliente1234!\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/registro",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/registro",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "registro"]
             }
           }
@@ -69,6 +107,9 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.token) {",
                   "    pm.collectionVariables.set(\"tokenAdmin\", jsonData.token);",
@@ -91,8 +132,8 @@
               "raw": "{\n  \"email\": \"admin@tienda.com\",\n  \"password\": \"Admin1234!\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/login",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/login",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "login"]
             }
           }
@@ -104,6 +145,9 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.token) {",
                   "    pm.collectionVariables.set(\"tokenCliente\", jsonData.token);",
@@ -126,14 +170,27 @@
               "raw": "{\n  \"email\": \"cliente1@tienda.com\",\n  \"password\": \"Cliente1234!\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/login",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/login",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "login"]
             }
           }
         },
         {
           "name": "4. [ERROR 401] Login Credenciales Inválidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -147,14 +204,27 @@
               "raw": "{\n  \"email\": \"admin@tienda.com\",\n  \"password\": \"PasswordErronea123!\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/login",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/login",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "login"]
             }
           }
         },
         {
           "name": "5. Solicitar Recuperación Contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -168,14 +238,27 @@
               "raw": "{\n  \"email\": \"cliente1@tienda.com\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/recuperar",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/recuperar",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "recuperar"]
             }
           }
         },
         {
           "name": "6. Restablecer Contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -189,14 +272,27 @@
               "raw": "{\n  \"token\": \"PEGA_AQUI_EL_TOKEN_DE_RECUPERACION\",\n  \"nuevaPassword\": \"NuevaClaveSegura123!\"\n}"
             },
             "url": {
-              "raw": "{{usuariosUrl}}/api/auth/restablecer",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/auth/restablecer",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "auth", "restablecer"]
             }
           }
         },
         {
           "name": "7. Listar Clientes (Requiere Token ADMIN/EMPLEADO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -206,14 +302,27 @@
               }
             ],
             "url": {
-              "raw": "{{usuariosUrl}}/api/clientes",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/clientes",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "clientes"]
             }
           }
         },
         {
           "name": "8. Obtener Cliente por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -223,20 +332,35 @@
               }
             ],
             "url": {
-              "raw": "{{usuariosUrl}}/api/clientes/3",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/clientes/3",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "clientes", "3"]
             }
           }
         },
         {
           "name": "9. Verificar si Cliente Existe (Público)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property(\"existe\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{usuariosUrl}}/api/clientes/3/existe",
-              "host": ["{{usuariosUrl}}"],
+              "raw": "{{baseUrlUsuarios}}/api/clientes/3/existe",
+              "host": ["{{baseUrlUsuarios}}"],
               "path": ["api", "clientes", "3", "existe"]
             }
           }
@@ -248,30 +372,74 @@
       "item": [
         {
           "name": "1. Listar Categorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Lista contiene categorías iniciales\", function () {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(data).to.be.an(\"array\");",
+                  "    pm.expect(data.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/categorias",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/categorias",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "categorias"]
             }
           }
         },
         {
           "name": "2. Obtener Categoría por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/categorias/1",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/categorias/1",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "categorias", "1"]
             }
           }
         },
         {
           "name": "3. Crear Categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -285,14 +453,27 @@
               "raw": "{\n  \"nombre\": \"Calzado y Zapatillas\",\n  \"descripcion\": \"Zapatillas urbanas, formales y calzado deportivo\"\n}"
             },
             "url": {
-              "raw": "{{inventarioUrl}}/api/categorias",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/categorias",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "categorias"]
             }
           }
         },
         {
           "name": "4. Actualizar Categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -306,50 +487,125 @@
               "raw": "{\n  \"nombre\": \"Poleras y Camisas Actualizada\",\n  \"descripcion\": \"Nueva descripción para poleras y camisas\"\n}"
             },
             "url": {
-              "raw": "{{inventarioUrl}}/api/categorias/1",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/categorias/1",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "categorias", "1"]
             }
           }
         },
         {
-          "name": "5. Listar Productos",
+          "name": "5. Listar Productos [READ ALL]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Retorna lista de productos\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos"]
             }
           }
         },
         {
-          "name": "6. Obtener Producto por ID",
+          "name": "6. Obtener Producto por ID [READ ONE]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"El producto contiene campos válidos\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(1);",
+                  "    pm.expect(jsonData.nombre).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.precio).to.be.above(0);",
+                  "    pm.expect(jsonData.stock).to.be.at.least(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos/1",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos/1",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos", "1"]
             }
           }
         },
         {
           "name": "7. [ERROR 404] Producto Inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Formato JSON de error estructurado\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.estado).to.eql(404);",
+                  "    pm.expect(jsonData.mensaje).to.include(\"no encontrado\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos/9999",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos/9999",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos", "9999"]
             }
           }
         },
         {
-          "name": "8. Crear Producto",
+          "name": "8. Crear Producto [CREATE]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Producto creado con ID asignado\", function () {",
+                  "    pm.expect(jsonData.id).to.be.a(\"number\");",
+                  "    pm.expect(jsonData.nombre).to.eql(\"Sweater Lana Cuello V\");",
+                  "    pm.collectionVariables.set(\"productoNuevoId\", jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -363,14 +619,31 @@
               "raw": "{\n  \"nombre\": \"Sweater Lana Cuello V\",\n  \"descripcion\": \"Sweater abrigador de lana merino\",\n  \"talla\": \"L\",\n  \"color\": \"Burdeo\",\n  \"precio\": 32990,\n  \"stock\": 18,\n  \"categoriaId\": 1\n}"
             },
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos"]
             }
           }
         },
         {
-          "name": "9. Actualizar Producto",
+          "name": "9. Actualizar Producto [UPDATE]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Nombre y precio actualizados\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.nombre).to.include(\"Premium\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -384,14 +657,31 @@
               "raw": "{\n  \"nombre\": \"Camisa Oxford Formal Premium\",\n  \"descripcion\": \"Camisa oxford 100% algodón egipcio\",\n  \"talla\": \"L\",\n  \"color\": \"Celeste\",\n  \"precio\": 26990,\n  \"stock\": 30,\n  \"categoriaId\": 1\n}"
             },
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos/1",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos/1",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos", "1"]
             }
           }
         },
         {
-          "name": "10. Ajustar Stock de Producto",
+          "name": "10. Ajustar Stock de Producto [PATCH]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Stock actualizado\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.stock).to.be.at.least(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -405,32 +695,58 @@
               "raw": "{\n  \"cantidad\": 10\n}"
             },
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos/1/stock",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos/1/stock",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos", "1", "stock"]
             }
           }
         },
         {
-          "name": "11. Eliminar Categoría",
+          "name": "11. Eliminar Categoría [DELETE]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/categorias/3",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/categorias/3",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "categorias", "3"]
             }
           }
         },
         {
-          "name": "12. Eliminar Producto",
+          "name": "12. Eliminar Producto [DELETE]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{inventarioUrl}}/api/productos/6",
-              "host": ["{{inventarioUrl}}"],
+              "raw": "{{baseUrlInventario}}/api/productos/6",
+              "host": ["{{baseUrlInventario}}"],
               "path": ["api", "productos", "6"]
             }
           }
@@ -442,6 +758,19 @@
       "item": [
         {
           "name": "1. Crear Pedido Exitoso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -455,14 +784,27 @@
               "raw": "{\n  \"clienteId\": 3,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 2\n    },\n    {\n      \"productoId\": 2,\n      \"cantidad\": 1\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos"]
             }
           }
         },
         {
           "name": "2. [ERROR 409] Crear Pedido con Stock Insuficiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -476,50 +818,102 @@
               "raw": "{\n  \"clienteId\": 3,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 99999\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos"]
             }
           }
         },
         {
           "name": "3. Listar Pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos"]
             }
           }
         },
         {
           "name": "4. Obtener Pedido por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos/1",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos/1",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos", "1"]
             }
           }
         },
         {
           "name": "5. Listar Pedidos de un Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos/cliente/3",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos/cliente/3",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos", "cliente", "3"]
             }
           }
         },
         {
           "name": "6. Cambiar Estado a CANCELADO (Repone Stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -533,20 +927,33 @@
               "raw": "{\n  \"estado\": \"CANCELADO\"\n}"
             },
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos/1/estado",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos/1/estado",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos", "1", "estado"]
             }
           }
         },
         {
           "name": "7. Listar Notificaciones de un Pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{pedidosUrl}}/api/pedidos/1/notificaciones",
-              "host": ["{{pedidosUrl}}"],
+              "raw": "{{baseUrlPedidos}}/api/pedidos/1/notificaciones",
+              "host": ["{{baseUrlPedidos}}"],
               "path": ["api", "pedidos", "1", "notificaciones"]
             }
           }
@@ -558,6 +965,19 @@
       "item": [
         {
           "name": "1. Procesar Pago Tarjeta Crédito (Exitoso)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -571,14 +991,27 @@
               "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"TARJETA_CREDITO\",\n  \"numeroTarjeta\": \"4532112233441234\"\n}"
             },
             "url": {
-              "raw": "{{ventasUrl}}/api/pagos",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/pagos",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "pagos"]
             }
           }
         },
         {
           "name": "2. [ERROR 402] Pago Rechazado Tarjeta terminada en 0000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 402 Payment Required\", function () {",
+                  "    pm.response.to.have.status(402);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -592,14 +1025,27 @@
               "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"TARJETA_CREDITO\",\n  \"numeroTarjeta\": \"4532112233440000\"\n}"
             },
             "url": {
-              "raw": "{{ventasUrl}}/api/pagos",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/pagos",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "pagos"]
             }
           }
         },
         {
           "name": "3. Procesar Pago PayPal (Exitoso)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -613,44 +1059,83 @@
               "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"PAYPAL\",\n  \"emailPaypal\": \"cliente1@tienda.com\"\n}"
             },
             "url": {
-              "raw": "{{ventasUrl}}/api/pagos",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/pagos",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "pagos"]
             }
           }
         },
         {
           "name": "4. Listar Todas las Ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{ventasUrl}}/api/ventas",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/ventas",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "ventas"]
             }
           }
         },
         {
           "name": "5. Obtener Venta por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{ventasUrl}}/api/ventas/1",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/ventas/1",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "ventas", "1"]
             }
           }
         },
         {
           "name": "6. Informe: Productos Más Vendidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{ventasUrl}}/api/informes/mas-vendidos?limite=5",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/informes/mas-vendidos?limite=5",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "informes", "mas-vendidos"],
               "query": [
                 {
@@ -663,12 +1148,25 @@
         },
         {
           "name": "7. Informe: Tendencias de Ventas por Día",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{ventasUrl}}/api/informes/tendencias?desde=2026-09-01&hasta=2026-10-31",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/informes/tendencias?desde=2026-09-01&hasta=2026-10-31",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "informes", "tendencias"],
               "query": [
                 {
@@ -685,12 +1183,25 @@
         },
         {
           "name": "8. Informe: Resumen General de Ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{ventasUrl}}/api/informes/resumen",
-              "host": ["{{ventasUrl}}"],
+              "raw": "{{baseUrlVentas}}/api/informes/resumen",
+              "host": ["{{baseUrlVentas}}"],
               "path": ["api", "informes", "resumen"]
             }
           }

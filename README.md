@@ -315,6 +315,19 @@ En la raíz del proyecto se incluye el archivo:
 
 Importa este archivo en Postman para obtener:
 - Una carpeta por microservicio (`ms-usuarios`, `ms-inventario`, `ms-pedidos`, `ms-ventas`).
-- Variables de colección: `{{usuariosUrl}}`, `{{inventarioUrl}}`, `{{pedidosUrl}}`, `{{ventasUrl}}`.
+- Variables de colección explícitas separadas por microservicio:
+  - `{{baseUrlUsuarios}}`: `http://localhost:8081`
+  - `{{baseUrlInventario}}`: `http://localhost:8082`
+  - `{{baseUrlPedidos}}`: `http://localhost:8083`
+  - `{{baseUrlVentas}}`: `http://localhost:8084`
+- Pruebas y aserciones automatizadas (`pm.test`) en todas las peticiones para verificar códigos de estado y payloads.
+- Suite de pruebas del **CRUD completo de productos** en `ms-inventario`:
+  - **CREATE**: `8. Crear Producto` (`POST /api/productos` ➔ `201 Created`)
+  - **READ (All)**: `5. Listar Productos` (`GET /api/productos` ➔ `200 OK`)
+  - **READ (One)**: `6. Obtener Producto por ID` (`GET /api/productos/1` ➔ `200 OK`)
+  - **UPDATE**: `9. Actualizar Producto` (`PUT /api/productos/1` ➔ `200 OK`)
+  - **PATCH (Stock)**: `10. Ajustar Stock de Producto` (`PATCH /api/productos/1/stock` ➔ `200 OK`)
+  - **DELETE**: `12. Eliminar Producto` (`DELETE /api/productos/6` ➔ `204 No Content`)
 - Scripts de prueba automáticos para guardar el token JWT en las variables de la colección tras hacer login.
 - Peticiones dedicadas para cada uno de los casos de error requeridos (401, 404, 409, 402).
+
