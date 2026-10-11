@@ -1,0 +1,677 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Tienda de Ropa - Microservicios",
+    "description": "Colección completa para el sistema de microservicios de Tienda de Ropa (ms-usuarios, ms-inventario, ms-pedidos, ms-ventas). Incluye casos exitosos y casos de error (401, 404, 409, 402).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "usuariosUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "inventarioUrl",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "pedidosUrl",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "ventasUrl",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tokenCliente",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "ms-usuarios (8081)",
+      "item": [
+        {
+          "name": "1. Registro de Cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo Cliente Postman\",\n  \"email\": \"nuevo.cliente@tienda.com\",\n  \"password\": \"Cliente1234!\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/registro",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "registro"]
+            }
+          }
+        },
+        {
+          "name": "2. Login Exitoso (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"tokenAdmin\", jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tienda.com\",\n  \"password\": \"Admin1234!\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/login",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "3. Login Exitoso (CLIENTE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"tokenCliente\", jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente1@tienda.com\",\n  \"password\": \"Cliente1234!\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/login",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "4. [ERROR 401] Login Credenciales Inválidas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tienda.com\",\n  \"password\": \"PasswordErronea123!\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/login",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "5. Solicitar Recuperación Contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente1@tienda.com\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/recuperar",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "recuperar"]
+            }
+          }
+        },
+        {
+          "name": "6. Restablecer Contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"PEGA_AQUI_EL_TOKEN_DE_RECUPERACION\",\n  \"nuevaPassword\": \"NuevaClaveSegura123!\"\n}"
+            },
+            "url": {
+              "raw": "{{usuariosUrl}}/api/auth/restablecer",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "auth", "restablecer"]
+            }
+          }
+        },
+        {
+          "name": "7. Listar Clientes (Requiere Token ADMIN/EMPLEADO)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{usuariosUrl}}/api/clientes",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "8. Obtener Cliente por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{usuariosUrl}}/api/clientes/3",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "clientes", "3"]
+            }
+          }
+        },
+        {
+          "name": "9. Verificar si Cliente Existe (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{usuariosUrl}}/api/clientes/3/existe",
+              "host": ["{{usuariosUrl}}"],
+              "path": ["api", "clientes", "3", "existe"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ms-inventario (8082)",
+      "item": [
+        {
+          "name": "1. Listar Categorías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/categorias",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "2. Obtener Categoría por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/categorias/1",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "categorias", "1"]
+            }
+          }
+        },
+        {
+          "name": "3. Crear Categoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Calzado y Zapatillas\",\n  \"descripcion\": \"Zapatillas urbanas, formales y calzado deportivo\"\n}"
+            },
+            "url": {
+              "raw": "{{inventarioUrl}}/api/categorias",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "4. Actualizar Categoría",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Poleras y Camisas Actualizada\",\n  \"descripcion\": \"Nueva descripción para poleras y camisas\"\n}"
+            },
+            "url": {
+              "raw": "{{inventarioUrl}}/api/categorias/1",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "categorias", "1"]
+            }
+          }
+        },
+        {
+          "name": "5. Listar Productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "6. Obtener Producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos/1",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos", "1"]
+            }
+          }
+        },
+        {
+          "name": "7. [ERROR 404] Producto Inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos/9999",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos", "9999"]
+            }
+          }
+        },
+        {
+          "name": "8. Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sweater Lana Cuello V\",\n  \"descripcion\": \"Sweater abrigador de lana merino\",\n  \"talla\": \"L\",\n  \"color\": \"Burdeo\",\n  \"precio\": 32990,\n  \"stock\": 18,\n  \"categoriaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos"]
+            }
+          }
+        },
+        {
+          "name": "9. Actualizar Producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Camisa Oxford Formal Premium\",\n  \"descripcion\": \"Camisa oxford 100% algodón egipcio\",\n  \"talla\": \"L\",\n  \"color\": \"Celeste\",\n  \"precio\": 26990,\n  \"stock\": 30,\n  \"categoriaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos/1",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos", "1"]
+            }
+          }
+        },
+        {
+          "name": "10. Ajustar Stock de Producto",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 10\n}"
+            },
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos/1/stock",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos", "1", "stock"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ms-pedidos (8083)",
+      "item": [
+        {
+          "name": "1. Crear Pedido Exitoso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 3,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 2\n    },\n    {\n      \"productoId\": 2,\n      \"cantidad\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "2. [ERROR 409] Crear Pedido con Stock Insuficiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 3,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 99999\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "3. Listar Pedidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          }
+        },
+        {
+          "name": "4. Obtener Pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos/1",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos", "1"]
+            }
+          }
+        },
+        {
+          "name": "5. Listar Pedidos de un Cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos/cliente/3",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos", "cliente", "3"]
+            }
+          }
+        },
+        {
+          "name": "6. Cambiar Estado a CANCELADO (Repone Stock)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"CANCELADO\"\n}"
+            },
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos/1/estado",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos", "1", "estado"]
+            }
+          }
+        },
+        {
+          "name": "7. Listar Notificaciones de un Pedido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{pedidosUrl}}/api/pedidos/1/notificaciones",
+              "host": ["{{pedidosUrl}}"],
+              "path": ["api", "pedidos", "1", "notificaciones"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ms-ventas (8084)",
+      "item": [
+        {
+          "name": "1. Procesar Pago Tarjeta Crédito (Exitoso)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"TARJETA_CREDITO\",\n  \"numeroTarjeta\": \"4532112233441234\"\n}"
+            },
+            "url": {
+              "raw": "{{ventasUrl}}/api/pagos",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "pagos"]
+            }
+          }
+        },
+        {
+          "name": "2. [ERROR 402] Pago Rechazado Tarjeta terminada en 0000",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"TARJETA_CREDITO\",\n  \"numeroTarjeta\": \"4532112233440000\"\n}"
+            },
+            "url": {
+              "raw": "{{ventasUrl}}/api/pagos",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "pagos"]
+            }
+          }
+        },
+        {
+          "name": "3. Procesar Pago PayPal (Exitoso)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": 1,\n  \"metodoPago\": \"PAYPAL\",\n  \"emailPaypal\": \"cliente1@tienda.com\"\n}"
+            },
+            "url": {
+              "raw": "{{ventasUrl}}/api/pagos",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "pagos"]
+            }
+          }
+        },
+        {
+          "name": "4. Listar Todas las Ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ventasUrl}}/api/ventas",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "ventas"]
+            }
+          }
+        },
+        {
+          "name": "5. Obtener Venta por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ventasUrl}}/api/ventas/1",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "ventas", "1"]
+            }
+          }
+        },
+        {
+          "name": "6. Informe: Productos Más Vendidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ventasUrl}}/api/informes/mas-vendidos?limite=5",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "informes", "mas-vendidos"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Informe: Tendencias de Ventas por Día",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ventasUrl}}/api/informes/tendencias?desde=2026-09-01&hasta=2026-10-31",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "informes", "tendencias"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-09-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Informe: Resumen General de Ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ventasUrl}}/api/informes/resumen",
+              "host": ["{{ventasUrl}}"],
+              "path": ["api", "informes", "resumen"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
