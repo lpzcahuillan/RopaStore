@@ -410,6 +410,30 @@
               "path": ["api", "productos", "1", "stock"]
             }
           }
+        },
+        {
+          "name": "11. Eliminar Categoría",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/categorias/3",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "categorias", "3"]
+            }
+          }
+        },
+        {
+          "name": "12. Eliminar Producto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{inventarioUrl}}/api/productos/6",
+              "host": ["{{inventarioUrl}}"],
+              "path": ["api", "productos", "6"]
+            }
+          }
         }
       ]
     },

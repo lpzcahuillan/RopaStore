@@ -32,7 +32,7 @@ public class PagoService {
     private final FabricaEstrategiaPago fabricaEstrategiaPago;
     private final VentaRepository ventaRepository;
 
-    @Transactional
+    @Transactional(noRollbackFor = PagoRechazadoException.class)
     public Venta procesarPago(SolicitudPagoDTO solicitud) {
         // 1. Obtener pedido de ms-pedidos
         PedidoDTO pedido = pedidoClient.obtenerPedido(solicitud.getPedidoId());
